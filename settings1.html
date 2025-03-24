@@ -138,6 +138,42 @@ body {
    
 </style>
 
+<script type="module">
+    import { auth, db } from './LogIn-Register.js';
+    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js';
+    import { doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js';
+    import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js';
+    
+    const storage = getStorage();
+    
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+    
+            if (userSnap.exists()) {
+                const userData = userSnap.data();
+    
+                // عرض البيانات في الفورم
+                document.getElementById("username").value = userData.username || "";
+                document.getElementById("email").value = userData.email || "";
+                document.getElementById("linkedinHandle").value = userData.contactInfo?.linkedinHandle || "";
+                document.getElementById("xHandle").value = userData.contactInfo?.xHandle || "";
+    
+                // عرض صورة الملف الشخصي
+                const profileImg = document.querySelector(".profile-picture img");
+                if (userData.profileImage) {
+                    profileImg.src = userData.profileImage;
+                }
+    
+            } else {
+                alert("تعذر تحميل بيانات المستخدم.");
+            }
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+    </script>
 
 </head>
 <body>
@@ -163,10 +199,80 @@ body {
         <label for="password">كلمة المرور</label>
         <input type="password" id="password" placeholder="********">
 
+        <label for="linkedinHandle">حساب LinkedIn</label>
+        <input type="text" id="linkedinHandle" placeholder="اسم المستخدم في LinkedIn">
+
+        <label for="xHandle">حساب X</label>
+        <input type="text" id="xHandle" placeholder="@yourhandle">
+
+        <label for="profileImage">تغيير الصورة الشخصية</label>
+        <input type="file" id="profileImage" accept="image/*">
+
         <label for="bio">نبذة</label>
         <textarea id="bio" placeholder="شخص طموح أسعى دائمًا للابتكار وتطوير الحلول الحديثة. أحب استكشاف الأفكار الجديدة التي تساهم في تحسين الحياة من حولي."></textarea>
 
         <button type="submit">حفظ التعديلات</button>
     </form>
+
+
+
+    <script type="module">
+        import { auth, db } from './LogIn-Register.js';
+        import { doc, updateDoc } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js';
+        import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js';
+        
+        const storage = getStorage();
+        
+        document.querySelector(".profile-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+        
+            const username = document.getElementById("username").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const linkedinHandle = document.getElementById("linkedinHandle").value.trim();
+            const xHandle = document.getElementById("xHandle").value.trim();
+            const profileImageFile = document.getElementById("profileImage").files[0];
+        
+            const user = auth.currentUser;
+            if (!user) {
+                alert("لا يوجد مستخدم مسجل دخول.");
+                return;
+            }
+        
+            let profileImageURL = null;
+        
+            // إذا المستخدم رفع صورة جديدة
+            if (profileImageFile) {
+                const storageRef = ref(storage, `profileImages/${user.uid}`);
+                const snapshot = await uploadBytes(storageRef, profileImageFile);
+                profileImageURL = await getDownloadURL(snapshot.ref);
+            }
+        
+            const userRef = doc(db, "users", user.uid);
+        
+            const updatedData = {
+                username,
+                email,
+                contactInfo: {
+                    linkedinHandle,
+                    xHandle
+                }
+            };
+        
+            if (profileImageURL) {
+                updatedData.profileImage = profileImageURL;
+            }
+        
+            try {
+                await updateDoc(userRef, updatedData);
+                alert("تم حفظ التعديلات بنجاح!");
+                location.reload();
+            } catch (error) {
+                console.error("خطأ في حفظ التعديلات:", error);
+                alert("حدث خطأ، يرجى المحاولة لاحقاً.");
+            }
+        });
+        </script>
+        
 </body>
 </html>
+
