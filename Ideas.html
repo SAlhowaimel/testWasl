@@ -471,24 +471,22 @@ onSnapshot(ideasQuery, snapshot => {
         const card = document.createElement("div");
         card.className = "idea-card";
         
-        card.innerHTML = `
-            <div class="profile">
-                <img src="${photoSrc}" alt="${idea.username}" 
-                     onerror="this.onerror=null; this.src='images/default-avatar.png';">
-                <p class="creator">${idea.username}</p>
-            </div>
-            <div class="idea-content">
-                <p><strong>${idea.title}</strong></p>
-                <p>مجال الفكرة: ${idea.domain}</p>
-<p>${idea.createdAtHijri}</p>
-
-            </div>
-        `;
+     card.innerHTML = `
+    <div class="profile">
+        <img src="${photoSrc}" alt="${idea.username}" 
+             onerror="this.onerror=null; this.src='images/default-avatar.png';">
+        <p class="creator">${idea.username}</p>
+    </div>
+    <div class="idea-content">
+        <a href="https://hadeelbjs.github.io/testWasl/IdeaDetails.html?id=${docSnap.id}" class="idea-link" style="text-decoration: none; color: inherit;">
+            <p><strong>${idea.title}</strong></p>
+        </a>
+        <p>مجال الفكرة: ${idea.domain}</p>
+        <p>${idea.createdAtHijri}</p>
+    </div>
+`;
         
-        // إضافة حدث الضغط على الكارد للتوجيه إلى تفاصيل الفكرة
-card.addEventListener("click", () => {
-window.location.href = `https://hadeelbjs.github.io/WaslWebsite/IdeaDetails.html?id=${docSnap.id}`;
-});
+
 
         ideasContainer.appendChild(card);
     });
