@@ -128,12 +128,7 @@
   <script type="module">
     import { auth, db } from './LogIn-Register.js';
     import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
-    import {
-      onAuthStateChanged,
-      updateEmail,
-      EmailAuthProvider,
-      reauthenticateWithCredential
-    } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
     import {
       getStorage,
       ref,
@@ -159,20 +154,18 @@
     });
 
     let currentUserId = null;
-    let currentEmail = "";
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUserId = user.uid;
-        currentEmail = user.email;
         const userRef = doc(db, "users", currentUserId);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const data = userSnap.data();
           document.getElementById("username").value = data.username || "";
-          document.getElementById("email").value = data.email || "";
           document.getElementById("linkedinHandle").value = data.contactInfo?.linkedinHandle || "";
           document.getElementById("xHandle").value = data.contactInfo?.xHandle || "";
+          document.getElementById("bio").value = data.bio || "";
           document.getElementById("displayUsername").textContent = data.username || "الملف الشخصي";
           if (data.profileImage) {
             profilePreview.src = data.profileImage;
@@ -188,19 +181,18 @@
       if (!currentUserId) return;
 
       const username = document.getElementById("username").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
       const linkedinHandle = document.getElementById("linkedinHandle").value.trim();
       const xHandle = document.getElementById("xHandle").value.trim();
+      const bio = document.getElementById("bio").value.trim();
 
-      if (!username || !email) {
-        alert("يرجى تعبئة اسم المستخدم والبريد الإلكتروني.");
+      if (!username) {
+        alert("يرجى تعبئة اسم المستخدم.");
         return;
       }
 
       let updatedData = {
         username,
-        email,
+        bio,
         contactInfo: {
           linkedinHandle,
           xHandle
@@ -208,18 +200,6 @@
       };
 
       try {
-        // إعادة المصادقة إذا تغير الإيميل
-        if (auth.currentUser.email !== email) {
-          if (!password) {
-            alert("يرجى إدخال كلمة المرور الحالية لتحديث البريد.");
-            return;
-          }
-
-          const credential = EmailAuthProvider.credential(auth.currentUser.email, password);
-          await reauthenticateWithCredential(auth.currentUser, credential);
-          await updateEmail(auth.currentUser, email);
-        }
-
         // تحميل صورة جديدة إذا تم اختيارها
         if (selectedImageFile) {
           const storageRef = ref(storage, `profileImages/${currentUserId}`);
@@ -235,7 +215,7 @@
         location.reload();
       } catch (error) {
         console.error("خطأ في التحديث:", error);
-        alert("حدث خطأ أثناء حفظ التعديلات. قد تحتاج إلى تسجيل الدخول مجددًا لتحديث البريد.");
+        alert("حدث خطأ أثناء حفظ التعديلات.");
       }
     });
   </script>
