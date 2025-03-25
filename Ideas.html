@@ -459,22 +459,24 @@ onSnapshot(ideasQuery, snapshot => {
     }
     noIdeasMessage.style.display = "none";
 
-    snapshot.docs.forEach(docSnap => {
-        const idea = docSnap.data();
-        
-        // التأكد من الصورة الصحيحة
-        let photoSrc = idea.userProfilePic || "images/default-avatar.png"; // استخدام الحقل الصحيح
-        if (photoSrc && !photoSrc.startsWith("http")) {
-            photoSrc = `/${photoSrc.replace(/^\/?/, "")}`; // تأكد من عدم وجود / في بداية الرابط
-        }
+snapshot.docs.forEach(docSnap => {
+  const idea = docSnap.data();
+  
+  // إذا المستخدم ما حط صورة، نستخدم الصورة الافتراضية
+  let photoSrc = idea.userProfilePic || "images/default-avatar.png";
+  if (photoSrc && !photoSrc.startsWith("http")) {
+    photoSrc = /${photoSrc.replace(/^\/?/, "")};
+  }
 
-        const card = document.createElement("div");
-        card.className = "idea-card";
-        
-     card.innerHTML = `
+  const card = document.createElement("div");
+  card.className = "idea-card";
+
+  card.innerHTML = `
     <div class="profile">
-        <img src="${photoSrc}" alt="${idea.username}" 
-             onerror="this.onerror=null; this.src='images/default-avatar.png';">
+        <a href="account1.html?uid=${idea.userId}">
+          <img src="${photoSrc}" alt="${idea.username}" 
+               onerror="this.onerror=null; this.src='images/default-avatar.png';">
+        </a>
         <p class="creator">${idea.username}</p>
     </div>
     <div class="idea-content">
@@ -484,12 +486,9 @@ onSnapshot(ideasQuery, snapshot => {
         <p>مجال الفكرة: ${idea.domain}</p>
         <p>${idea.createdAtHijri}</p>
     </div>
-`;
-        
-
-
-        ideasContainer.appendChild(card);
-    });
+  `;
+  ideasContainer.appendChild(card);
+});
 });
 
 
