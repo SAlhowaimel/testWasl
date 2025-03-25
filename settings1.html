@@ -116,8 +116,8 @@
     <label for="email">البريد الإلكتروني</label>
     <input type="email" id="email">
 
-    <label for="password">كلمة المرور</label>
-    <input type="password" id="password" placeholder="********" disabled>
+    <label for="password">كلمة المرور (للتأكيد عند تغيير البريد)</label>
+    <input type="password" id="password" placeholder="********">
 
     <label for="linkedinHandle">حساب LinkedIn</label>
     <input type="text" id="linkedinHandle" placeholder="مثال: user-name">
@@ -134,8 +134,18 @@
   <script type="module">
     import { auth, db } from './LogIn-Register.js';
     import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
-    import { onAuthStateChanged, updateEmail } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js";
+    import {
+      onAuthStateChanged,
+      updateEmail,
+      EmailAuthProvider,
+      reauthenticateWithCredential
+    } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+    import {
+      getStorage,
+      ref,
+      uploadBytes,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js";
 
     const storage = getStorage();
     const profileImageInput = document.getElementById("profileImage");
@@ -155,9 +165,12 @@
     });
 
     let currentUserId = null;
+    let currentEmail = "";
+
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUserId = user.uid;
+        currentEmail = user.email;
         const userRef = doc(db, "users", currentUserId);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
@@ -182,8 +195,14 @@
 
       const username = document.getElementById("username").value.trim();
       const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
       const linkedinHandle = document.getElementById("linkedinHandle").value.trim();
       const xHandle = document.getElementById("xHandle").value.trim();
+
+      if (!username || !email) {
+        alert("يرجى تعبئة اسم المستخدم والبريد الإلكتروني.");
+        return;
+      }
 
       let updatedData = {
         username,
@@ -195,12 +214,19 @@
       };
 
       try {
-        // تحديث الإيميل في Authentication
+        // إعادة المصادقة إذا تغير الإيميل
         if (auth.currentUser.email !== email) {
+          if (!password) {
+            alert("يرجى إدخال كلمة المرور الحالية لتحديث البريد.");
+            return;
+          }
+
+          const credential = EmailAuthProvider.credential(auth.currentUser.email, password);
+          await reauthenticateWithCredential(auth.currentUser, credential);
           await updateEmail(auth.currentUser, email);
         }
 
-        // رفع الصورة إذا تم اختيار واحدة جديدة
+        // تحميل صورة جديدة إذا تم اختيارها
         if (selectedImageFile) {
           const storageRef = ref(storage, `profileImages/${currentUserId}`);
           const snapshot = await uploadBytes(storageRef, selectedImageFile);
@@ -208,7 +234,7 @@
           updatedData.profileImage = downloadURL;
         }
 
-        // تحديث البيانات في Firestore
+        // تحديث بيانات Firestore
         await updateDoc(doc(db, "users", currentUserId), updatedData);
 
         alert("تم حفظ التعديلات بنجاح!");
