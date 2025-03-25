@@ -190,46 +190,6 @@
     </div>
   </div>
 
-  <script type="module">
-    import { auth, db } from './LogIn-Register.js';
-    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          const data = userSnap.data();
-
-          // تحديث الصورة
-          if (data.profileImage) {
-            document.getElementById("profileImg").src = data.profileImage;
-          }
-
-          // تحديث الاسم
-          document.getElementById("profileName").textContent = data.username || "المستخدم";
-
-          // تحديث النبذة
-          document.getElementById("bioText").textContent = data.bio || "لا توجد نبذة حالياً.";
-
-          // تحديث روابط التواصل
-          const xHandle = data.contactInfo?.xHandle || "";
-          const linkedinHandle = data.contactInfo?.linkedinHandle || "";
-
-          const xLink = document.getElementById("xHandleLink");
-          xLink.textContent = xHandle || "@غير متوفر";
-          xLink.href = xHandle ? `https://x.com/${xHandle.replace("@", "")}` : "#";
-
-          const linkedinLink = document.getElementById("linkedinLink");
-          linkedinLink.textContent = linkedinHandle || "غير متوفر";
-          linkedinLink.href = linkedinHandle ? `https://www.linkedin.com/in/${linkedinHandle}` : "#";
-        }
-      } else {
-        window.location.href = "login.html";
-      }
-    });
-  </script>
-
+  
 </body>
 </html>
