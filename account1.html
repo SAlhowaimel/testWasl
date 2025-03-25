@@ -104,28 +104,48 @@
   </div>
 
   <script type="module">
-    import { auth, db } from './LogIn-Register.js';
-    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const userRef = doc(db, "users", user.uid);
+    const firebaseConfig = {
+      apiKey: "AIzaSyC68KD9M_rGGOoyfQaW925LT8ipoj9jE44",
+      authDomain: "wasl-523b4.firebaseapp.com",
+      projectId: "wasl-523b4",
+      storageBucket: "wasl-523b4.appspot.com",
+      messagingSenderId: "410509570015",
+      appId: "1:410509570015:web:4c9a86048b3e8be0bd1e6a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const params = new URLSearchParams(window.location.search);
+    const uid = params.get("uid");
+
+    if (!uid) {
+      alert("لا يمكن تحميل الصفحة بدون uid.");
+    } else {
+      const loadUser = async () => {
+        const userRef = doc(db, "users", uid);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const data = userSnap.data();
+
           document.getElementById("displayUsername").textContent = data.username || "مستخدم";
           document.getElementById("displayBio").textContent = data.bio || "لا توجد نبذة حالياً.";
           document.getElementById("xHandle").textContent = data.contactInfo?.xHandle || "@username";
           document.getElementById("linkedinHandle").textContent = data.contactInfo?.linkedinHandle || "linkedin-user";
+
           if (data.profileImage) {
             document.getElementById("profileImage").src = data.profileImage;
           }
+        } else {
+          document.querySelector(".profile-card").innerHTML = "<p style='text-align:center;'>لا يوجد مستخدم بهذا المعرف.</p>";
         }
-      } else {
-        window.location.href = "login.html";
-      }
-    });
+      };
+
+      loadUser();
+    }
   </script>
 </body>
 </html>
