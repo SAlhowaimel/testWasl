@@ -100,7 +100,6 @@
 <body>
 
   <span class="material-symbols-outlined" onclick="history.back();">arrow_back</span><br>
-
   <h2 class="profile-title" id="displayUsername">تحميل...</h2>
 
   <div class="profile-picture">
@@ -120,7 +119,7 @@
     <input type="text" id="xHandle" placeholder="مثال: @username">
 
     <label for="bio">نبذة</label>
-    <textarea id="bio" placeholder="شخص طموح أسعى دائمًا للابتكار وتطوير الحلول الحديثة. أحب استكشاف الأفكار الجديدة التي تساهم في تحسين الحياة من حولي."></textarea>
+    <textarea id="bio" placeholder="شخص طموح يسعى للابتكار..."></textarea>
 
     <button type="submit">حفظ التعديلات</button>
   </form>
@@ -129,12 +128,7 @@
     import { auth, db } from './LogIn-Register.js';
     import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
-    import {
-      getStorage,
-      ref,
-      uploadBytes,
-      getDownloadURL
-    } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js";
 
     const storage = getStorage();
     const profileImageInput = document.getElementById("profileImage");
@@ -200,7 +194,6 @@
       };
 
       try {
-        // تحميل صورة جديدة إذا تم اختيارها
         if (selectedImageFile) {
           const storageRef = ref(storage, `profileImages/${currentUserId}`);
           const snapshot = await uploadBytes(storageRef, selectedImageFile);
@@ -208,17 +201,14 @@
           updatedData.profileImage = downloadURL;
         }
 
-        // تحديث بيانات Firestore
         await updateDoc(doc(db, "users", currentUserId), updatedData);
-
         alert("تم حفظ التعديلات بنجاح!");
         location.reload();
       } catch (error) {
-        console.error("خطأ في التحديث:", error);
+        console.error("خطأ:", error);
         alert("حدث خطأ أثناء حفظ التعديلات.");
       }
     });
   </script>
-
 </body>
 </html>
