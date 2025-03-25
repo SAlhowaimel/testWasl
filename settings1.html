@@ -211,6 +211,9 @@
         bio
       };
 
+      const bio = document.getElementById("bio").value.trim();
+updatedData.bio = bio;
+      
       // رفع صورة جديدة إن وُجدت
       if (selectedImageFile) {
         const storageRef = ref(storage, `profileImages/${currentUserId}`);
