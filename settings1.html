@@ -224,10 +224,24 @@
         }
 
         // تحديث البريد الإلكتروني إذا تغيّر
-        if (auth.currentUser.email !== email) {
-          await updateEmail(auth.currentUser, email);
-          updatedData.email = email;
-        }
+if (auth.currentUser.email !== email) {
+  try {
+    await updateEmail(auth.currentUser, email);
+    updatedData.email = email;
+  } catch (error) {
+    if (error.code === "auth/requires-recent-login") {
+      alert("لأسباب أمنية، يجب تسجيل الدخول من جديد لتغيير البريد الإلكتروني.");
+      window.location.href = "login.html"; // يعيد المستخدم لتسجيل الدخول
+      return;
+    } else if (error.code === "auth/operation-not-allowed") {
+      alert("التعديل على البريد غير مسموح حالياً. تأكد من إعدادات Firebase Auth.");
+      return;
+    } else {
+      alert("خطأ أثناء تحديث البريد: " + error.message);
+      return;
+    }
+  }
+}
 
         // تحديث كلمة المرور إذا كتب المستخدم واحدة جديدة
         if (newPassword) {
