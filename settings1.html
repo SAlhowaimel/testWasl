@@ -77,7 +77,8 @@
       margin: 10px 0 5px;
     }
 
-    .profile-form input, .profile-form textarea {
+    .profile-form input,
+    .profile-form textarea {
       padding: 12px;
       border-radius: 10px;
       width: 100%;
@@ -129,11 +130,17 @@
     <label for="email">البريد الإلكتروني</label>
     <input type="email" id="email">
 
+    <label for="password">كلمة المرور الجديدة</label>
+    <input type="password" id="password" placeholder="******">
+
     <label for="linkedinHandle">حساب LinkedIn</label>
     <input type="text" id="linkedinHandle" placeholder="مثال: user-name">
 
     <label for="xHandle">حساب X</label>
     <input type="text" id="xHandle" placeholder="مثال: @username">
+
+    <label for="bio">نبذة</label>
+    <textarea id="bio" placeholder="اكتب نبذة عنك..."></textarea>
 
     <button type="submit">حفظ التعديلات</button>
   </form>
@@ -141,15 +148,16 @@
   <script type="module">
     import { auth, db } from './LogIn-Register.js';
     import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+    import { onAuthStateChanged, updatePassword, updateEmail } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js";
 
     const storage = getStorage();
     const profileImageInput = document.getElementById("profileImage");
     const profilePreview = document.getElementById("profilePreview");
     let selectedImageFile = null;
+    let currentUserId = null;
 
-    // تغيير الصورة عند اختيار صورة جديدة
+    // معاينة الصورة المختارة
     profileImageInput.addEventListener("change", function () {
       const file = this.files[0];
       if (file) {
@@ -163,7 +171,6 @@
     });
 
     // تحميل بيانات المستخدم
-    let currentUserId = null;
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUserId = user.uid;
@@ -175,6 +182,7 @@
           document.getElementById("email").value = data.email || "";
           document.getElementById("linkedinHandle").value = data.contactInfo?.linkedinHandle || "";
           document.getElementById("xHandle").value = data.contactInfo?.xHandle || "";
+          document.getElementById("bio").value = data.bio || "";
           document.getElementById("displayUsername").textContent = data.username || "الملف الشخصي";
           if (data.profileImage) {
             profilePreview.src = data.profileImage;
@@ -192,33 +200,53 @@
 
       const username = document.getElementById("username").value.trim();
       const email = document.getElementById("email").value.trim();
+      const newPassword = document.getElementById("password").value;
       const linkedinHandle = document.getElementById("linkedinHandle").value.trim();
       const xHandle = document.getElementById("xHandle").value.trim();
+      const bio = document.getElementById("bio").value.trim();
 
       let updatedData = {
         username,
-        email,
+        bio,
         contactInfo: {
           linkedinHandle,
           xHandle
         }
       };
 
-      // رفع صورة جديدة إن وُجدت
-      if (selectedImageFile) {
-        const storageRef = ref(storage, `profileImages/${currentUserId}`);
-        const snapshot = await uploadBytes(storageRef, selectedImageFile);
-        const downloadURL = await getDownloadURL(snapshot.ref);
-        updatedData.profileImage = downloadURL;
-      }
-
       try {
+        // رفع الصورة إذا وُجدت
+        if (selectedImageFile) {
+          const storageRef = ref(storage, `profileImages/${currentUserId}`);
+          const snapshot = await uploadBytes(storageRef, selectedImageFile);
+          const downloadURL = await getDownloadURL(snapshot.ref);
+          updatedData.profileImage = downloadURL;
+        }
+
+        // تحديث البريد الإلكتروني إذا تغيّر
+        if (auth.currentUser.email !== email) {
+          await updateEmail(auth.currentUser, email);
+          updatedData.email = email;
+        }
+
+        // تحديث كلمة المرور إذا كتب المستخدم واحدة جديدة
+        if (newPassword) {
+          await updatePassword(auth.currentUser, newPassword);
+        }
+
+        // تحديث بيانات Firestore
         await updateDoc(doc(db, "users", currentUserId), updatedData);
+
         alert("تم حفظ التعديلات بنجاح!");
         location.reload();
       } catch (error) {
-        console.error("خطأ في التحديث:", error);
-        alert("حدث خطأ أثناء حفظ التعديلات.");
+        console.error("خطأ أثناء الحفظ:", error);
+        if (error.code === "auth/requires-recent-login") {
+          alert("لأسباب أمنية، يجب تسجيل الدخول من جديد لتعديل البريد أو كلمة المرور.");
+          window.location.href = "login.html";
+        } else {
+          alert("حدث خطأ أثناء حفظ التعديلات: " + error.message);
+        }
       }
     });
   </script>
