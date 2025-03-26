@@ -150,25 +150,32 @@
     let currentUserId = null;
 
     onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        currentUserId = user.uid;
-        const userRef = doc(db, "users", currentUserId);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          const data = userSnap.data();
-          document.getElementById("username").value = data.username || "";
-          document.getElementById("linkedinHandle").value = data.contactInfo?.linkedinHandle || "";
-          document.getElementById("xHandle").value = data.contactInfo?.xHandle || "";
-          document.getElementById("bio").value = data.bio || "";
-          document.getElementById("displayUsername").textContent = data.username || "الملف الشخصي";
-          if (data.profileImage) {
-            profilePreview.src = data.profileImage;
-          }
-        }
-      } else {
-        window.location.href = "login.html";
+  if (user) {
+    currentUserId = user.uid;
+    const userRef = doc(db, "users", currentUserId);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      const data = userSnap.data();
+
+      // إنشاء bio فارغ إذا ما كان موجود
+      if (!("bio" in data)) {
+        await updateDoc(userRef, { bio: "" });
       }
-    });
+
+      document.getElementById("username").value = data.username || "";
+      document.getElementById("linkedinHandle").value = data.contactInfo?.linkedinHandle || "";
+      document.getElementById("xHandle").value = data.contactInfo?.xHandle || "";
+      document.getElementById("bio").value = data.bio || "";
+      document.getElementById("displayUsername").textContent = data.username || "الملف الشخصي";
+      if (data.profileImage) {
+        profilePreview.src = data.profileImage;
+      }
+    }
+  } else {
+    window.location.href = "login.html";
+  }
+});
 
     document.getElementById("settingsForm").addEventListener("submit", async (e) => {
       e.preventDefault();
