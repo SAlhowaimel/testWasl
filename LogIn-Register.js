@@ -45,7 +45,14 @@ export async function registerUser() {
         alert("يرجى إدخال البريد الإلكتروني");
         return;
     }
-
+    
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+        alert("يرجى إدخال بريد إلكتروني صالح مثل example@example.com");
+        return;
+    }
+    
+    
     if (!password) {
         alert("يرجى إدخال كلمة المرور");
         return;
@@ -104,6 +111,7 @@ export async function registerUser() {
             email,
             userId: user.uid,
             dob,
+            bio,
             favorites: [], 
             contactInfo: {
                 xHandle,
