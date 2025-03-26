@@ -4,148 +4,270 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>صفحة المبتكر</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700&display=swap');
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Tajawal', sans-serif;
-      direction: rtl;
-    }
-    body {
-      background-color: #fff;
-    }
-    .material-symbols-outlined {
-      font-size: 40px;
-      color: #072D57;
-      position: absolute;
-      left: 2vw;
-      margin-top: 5vh;
-      cursor: pointer;
-    }
-    .profile-card {
-      max-width: 450px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: white;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-    }
-    .profile img {
-      display: block;
-      margin: 0 auto;
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      border: 3px solid #002147;
-    }
-    .profile h2 {
-      color: #002147;
-      margin-top: 10px;
-      text-align: center;
-    }
-    .profile-name, .profile-contact-info {
-      background-color: #f5f5f5;
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 20px;
-      text-align: center;
-    }
-    .profile-contact-icons {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-    }
-    .profile-contact-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .profile-contact-item img {
-      width: 24px;
-      height: 24px;
-    }
-    .profile-contact-item span {
-      font-size: 16px;
-      color: #002147;
-    }
-  </style>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=arrow_back" />
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Tajawal', sans-serif;
+    direction: rtl;
+}
+
+body {
+    background-color: #fff;
+	direction: rtl;
+
+}
+
+.profile-settings-icon {
+  position: absolute;
+  top: 18px;
+  right: 15px;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+}
+
+.profile-card {
+  max-width: 450px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.profile img {
+  display:block;
+  margin: 0 auto;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid #002147;
+  left:30px;
+}
+
+.profile h2 {
+  color: #002147;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.profile-ideas-section {
+  background-color: #f5f5f5;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.profile-ideas-section h3 {
+  color: #002147;
+  margin-bottom: 10px;
+  text-align:center;
+}
+
+.profile-ideas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  justify-content: center;
+}
+
+.profile-idea-box {
+  background-color: white;
+  padding: 15px;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.profile-idea-icons {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+}
+
+.profile-icon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.no-style-link{
+  text-decoration:none;
+  color:inherit;
+}
+
+.profile-idea-title {
+  font-weight: bold;
+  font-size: 16px;
+  margin-top: 5px;
+}
+
+.profile-idea-field, .profile-idea-date {
+  font-size: 14px;
+  color: #555;
+}
+
+.profile-name{
+  background-color: #f5f5f5;
+  text-align:center;
+  color: #122C52;
+  border-radius: 8px;
+}
+
+.profile-contact-info {
+  background-color: #f5f5f5;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.profile-contact-info h3 {
+  color: #002147;
+  margin-bottom: 10px;
+  text-align:center;
+}
+
+.profile-contact-icons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.profile-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.profile-contact-item img {
+  width: 24px;
+  height: 24px;
+}
+
+.profile-contact-item span {
+  font-size: 16px;
+  color: #002147;
+}
+
+.material-symbols-outlined {
+  font-size: 40px;
+  color: #072D57;
+  position: absolute;
+  left: 2vw;
+  margin-top: 5vh;
+  cursor: pointer;
+}
+</style>
+
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> 
 </head>
 <body>
+<span class="material-symbols-outlined" onclick="history.back();">arrow_back</span><br>
 
-  <span class="material-symbols-outlined" onclick="history.back();">arrow_back</span><br>
-
-  <div class="profile-card">
-    <div class="profile">
-      <img id="profileImage" src="images/default-avatar.png" alt="الصورة الشخصية">
-      <h2 id="displayUsername">تحميل...</h2>
-    </div>
-
-    <div class="profile-name">
-      <h3>عن المبتكر</h3>
-      <p id="displayBio">جارٍ تحميل النبذة...</p>
-    </div>
-
-    <div class="profile-contact-info">
-      <h3>معلومات التواصل</h3>
-      <div class="profile-contact-icons">
-        <div class="profile-contact-item">
-          <span id="xHandle">@x</span>
-          <img src="images/x..png" alt="تويتر">
-        </div>
-        <div class="profile-contact-item">
-          <span id="linkedinHandle">linkedin</span>
-          <img src="images/linkedn.png" alt="لينكدإن">
-        </div>
+<div class="profile-card">
+  <div class="profile">
+    <img id="profile-img" src="images/default-avatar.png" alt="الصورة الشخصية">
+    <h2 id="username">اسم المستخدم</h2>
+  </div>
+  <br>
+  <div class="profile-name">
+    <br><h3>عن المستخدم</h3>
+    <p id="user-bio">لا توجد نبذة حالياً.</p>
+    <br>
+  </div>
+  <br>
+  <div class="profile-ideas-section">
+    <h3>أفكار المستخدم</h3>
+    <div class="profile-ideas-container" id="ideas-container"></div>
+  </div>
+  <br>
+  <div class="profile-contact-info">
+    <h3>معلومات التواصل</h3>
+    <div class="profile-contact-icons">
+      <div class="profile-contact-item">
+        <span id="x-handle">غير متاح</span>
+        <img src="images/x..png" alt="تويتر">
+      </div>
+      <div class="profile-contact-item">
+        <span id="linkedin-handle">غير متاح</span>
+        <img src="images/linkedn.png" alt="لينكدإن">
       </div>
     </div>
   </div>
+</div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+  import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyC68KD9M_rGGOoyfQaW925LT8ipoj9jE44",
-      authDomain: "wasl-523b4.firebaseapp.com",
-      projectId: "wasl-523b4",
-      storageBucket: "wasl-523b4.appspot.com",
-      messagingSenderId: "410509570015",
-      appId: "1:410509570015:web:4c9a86048b3e8be0bd1e6a"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyC68KD9M_rGGOoyfQaW925LT8ipoj9jE44",
+    authDomain: "wasl-523b4.firebaseapp.com",
+    projectId: "wasl-523b4",
+    storageBucket: "wasl-523b4.appspot.com",
+    messagingSenderId: "410509570015",
+    appId: "1:410509570015:web:4c9a86048b3e8be0bd1e6a"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    const params = new URLSearchParams(window.location.search);
-    const uid = params.get("uid");
+  const params = new URLSearchParams(window.location.search);
+  const uid = params.get("uid");
 
-    if (!uid) {
-      alert("لا يمكن تحميل الصفحة بدون uid.");
-    } else {
-      const loadUser = async () => {
-        const userRef = doc(db, "users", uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          const data = userSnap.data();
+  if (uid) {
+    const userRef = doc(db, "users", uid);
+    const userSnap = await getDoc(userRef);
 
-          document.getElementById("displayUsername").textContent = data.username || "مستخدم";
-          document.getElementById("displayBio").textContent = data.bio || "لا توجد نبذة حالياً.";
-          document.getElementById("xHandle").textContent = data.contactInfo?.xHandle || "@username";
-          document.getElementById("linkedinHandle").textContent = data.contactInfo?.linkedinHandle || "linkedin-user";
+    if (userSnap.exists()) {
+      const user = userSnap.data();
+      document.getElementById("username").textContent = user.username || "مستخدم مجهول";
+      document.getElementById("profile-img").src = user.profileImage || "images/default-avatar.png";
+      document.getElementById("user-bio").textContent = user.bio || "لا توجد نبذة حالياً.";
+      document.getElementById("x-handle").textContent = user.contactInfo?.xHandle || "غير متاح";
+      document.getElementById("linkedin-handle").textContent = user.contactInfo?.linkedinHandle || "غير متاح";
 
-          if (data.profileImage) {
-            document.getElementById("profileImage").src = data.profileImage;
-          }
-        } else {
-          document.querySelector(".profile-card").innerHTML = "<p style='text-align:center;'>لا يوجد مستخدم بهذا المعرف.</p>";
-        }
-      };
-
-      loadUser();
+      loadUserIdeas(uid);
     }
-  </script>
+  }
+
+  async function loadUserIdeas(userId) {
+    const container = document.getElementById("ideas-container");
+    container.innerHTML = "";
+
+    const ideasQuery = query(collection(db, "ideas"), where("userId", "==", userId));
+    const ideasSnap = await getDocs(ideasQuery);
+
+    if (ideasSnap.empty) {
+      container.innerHTML = "<p style='text-align:center;color:gray;'>لا توجد أفكار.</p>";
+      return;
+    }
+
+    ideasSnap.forEach(docSnap => {
+      const idea = docSnap.data();
+      const div = document.createElement("div");
+      div.className = "profile-idea-box";
+      div.innerHTML = `
+        <p class="profile-idea-title">
+          <a href="IdeaDetails.html?id=${docSnap.id}" class="no-style-link">${idea.title}</a>
+        </p>
+        <p class="profile-idea-field">مجال الفكرة: ${idea.domain}</p>
+        <p class="profile-idea-date">${idea.createdAtHijri}</p>
+      `;
+      container.appendChild(div);
+    });
+  }
+</script>
+
 </body>
 </html>
+
