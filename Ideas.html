@@ -407,63 +407,94 @@
         </div>
    </div>
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getFirestore, collection, query, orderBy, onSnapshot, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-    const firebaseConfig = {
-        apiKey: "AIzaSyC68KD9M_rGGOoyfQaW925LT8ipoj9jE44",
-        authDomain: "wasl-523b4.firebaseapp.com",
-        projectId: "wasl-523b4",
-        storageBucket: "wasl-523b4.firebasestorage.app",
-        messagingSenderId: "410509570015",
-        appId: "1:410509570015:web:4c9a86048b3e8be0bd1e6a"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    const ideasCollection = collection(db,"ideas");
-    const ideasContainer = document.getElementById("ideas-container");
-    const noIdeasMessage = document.getElementById("no-ideas-message");
-    onAuthStateChanged(auth, user => {
-        if (!user) window.location.href = "login.html";
-    });
-const ideasQuery = query(collection(db, "ideas"));
-onSnapshot(ideasQuery, snapshot => {
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+import { 
+    getFirestore, collection, onSnapshot, getDoc, doc 
+} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyC68KD9M_rGGOoyfQaW925LT8ipoj9jE44",
+    authDomain: "wasl-523b4.firebaseapp.com",
+    projectId: "wasl-523b4",
+    storageBucket: "wasl-523b4.firebasestorage.app",
+    messagingSenderId: "410509570015",
+    appId: "1:410509570015:web:4c9a86048b3e8be0bd1e6a"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const ideasRef = collection(db, "ideas");
+const ideasContainer = document.getElementById("ideas-container");
+const noIdeasMessage = document.getElementById("no-ideas-message");
+
+// التأكد من تسجيل الدخول
+onAuthStateChanged(auth, user => {
+    if (!user) {
+        window.location.href = "login.html";
+    }
+});
+
+// عرض الأفكار من Firestore وجلب بيانات المستخدم
+onSnapshot(ideasRef, async (snapshot) => {
     ideasContainer.innerHTML = "";
+
     if (snapshot.empty) {
         noIdeasMessage.style.display = "block";
         return;
     }
+
     noIdeasMessage.style.display = "none";
-    snapshot.docs.forEach(docSnap => {
+
+    for (const docSnap of snapshot.docs) {
         const idea = docSnap.data();
-      
-        // التأكد من الصورة الصحيحة
-        let photoSrc = idea.userProfilePic || "images/default-avatar.png"; // استخدام الحقل الصحيح
-        if (photoSrc && !photoSrc.startsWith("http")) {
-            photoSrc = `/${photoSrc.replace(/^\/?/, "")}`; // تأكد من عدم وجود / في بداية الرابط
+        const userId = idea.userId;
+
+        // افتراضيات
+        let username = idea.username || "مستخدم";
+        let photoSrc = idea.userProfilePic || "images/default-avatar.png";
+
+        try {
+            const userDocRef = doc(db, "users", userId);
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (userDocSnap.exists()) {
+                const userData = userDocSnap.data();
+                username = userData.username || username;
+                photoSrc = userData.userProfilePic || photoSrc;
+            }
+        } catch (error) {
+            console.error("خطأ في جلب بيانات المستخدم:", error);
         }
+
+        if (photoSrc && !photoSrc.startsWith("http")) {
+            photoSrc = /${photoSrc.replace(/^\/?/, "")};
+        }
+
         const card = document.createElement("div");
         card.className = "idea-card";
-      
-card.innerHTML = `
-  <div class="profile">
-    <a href="https://hadeelbjs.github.io/WaslWebsite/account1.html?uid=${idea.userId}">
-      <img src="${photoSrc}" alt="${idea.username}" 
-           onerror="this.onerror=null; this.src='images/default-avatar.png';">
-    </a>
-    <p class="creator">${idea.username}</p>
-  </div>
-  <div class="idea-content">
-    <a href="https://hadeelbjs.github.io/WaslWebsite/IdeaDetails.html?id=${docSnap.id}" style="text-decoration: none; color: inherit;">
-      <p><strong>${idea.title}</strong></p>
-    </a>
-    <p>مجال الفكرة: ${idea.domain}</p>
-    <p>${idea.createdAtHijri}</p>
-  </div>
-`;
+
+        card.innerHTML = `
+            <div class="profile">
+                <a href="https://hadeelbjs.github.io/WaslWebsite/account1.html?uid=${userId}">
+                    <img src="${photoSrc}" alt="${username}" 
+                         onerror="this.onerror=null; this.src='images/default-avatar.png';">
+                </a>
+                <p class="creator">${username}</p>
+            </div>
+            <div class="idea-content">
+                <a href="https://hadeelbjs.github.io/WaslWebsite/IdeaDetails.html?id=${docSnap.id}" style="text-decoration: none; color: inherit;">
+                    <p><strong>${idea.title}</strong></p>
+                </a>
+                <p>مجال الفكرة: ${idea.domain}</p>
+                <p>${idea.createdAtHijri}</p>
+            </div>
+        `;
         ideasContainer.appendChild(card);
-    });
+    }
+});
 });
 // استخراج الفلاتر من URL والتأكد أنها ليست فارغة
 const urlParams = new URLSearchParams(window.location.search);
